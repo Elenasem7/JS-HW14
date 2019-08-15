@@ -13,11 +13,11 @@
        
        
        
-        setTimeout(()=> console.log('1'), 1300);
-        console.log('2')
-        console.log('3')
-        setTimeout(()=> console.log('4'), 300);
-        console.log('5')
+//         setTimeout(()=> console.log('1'), 1300);
+//         console.log('2')
+//         console.log('3')
+//         setTimeout(()=> console.log('4'), 300);
+//         console.log('5')
 
 
 
@@ -51,7 +51,27 @@
         // https://playwithpromise.herokuapp.com/api/order-review/getid/{id} 
         // https://playwithpromise.herokuapp.com/api/order-system/product/{productId}
 
+    function http(url) {
+                    return new Promise((res, rej) => {
+                        var Req = new XMLHttpRequest();
+                        Req.open("GET", url);
+                        Req.send();
+                        Req.onload = function () {
+                            if (!this.responseText) rej('BYE');
+                            res(JSON.parse(this.responseText));
+                        }
+                    })
+                }
 
+                async function callRequest() {
+                    let idRequest = await http(`https://playwithpromise.herokuapp.com/api/order-review/last`),
+                        data = await http(`https:playwithpromise.herokuapp.com/api/order-review/getid/${idRequest._id}`),
+                        urls = data.orderList.map(a => `https://playwithpromise.herokuapp.com/api/order-system/product/${a.productId}`),
+                        array = urls.map(url => http(url));
+                    return await Promise.all(array);
+                }
+
+                callRequest().then(resp => resp.forEach(prom => console.log(prom)));
 
 
 
